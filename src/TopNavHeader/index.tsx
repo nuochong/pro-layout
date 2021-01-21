@@ -1,4 +1,4 @@
-import { ref, computed, FunctionalComponent } from "vue";
+import { ref, computed, FunctionalComponent } from 'vue';
 import {
   SiderMenuProps,
   defaultRenderLogoAndTitle,
@@ -9,7 +9,7 @@ import { GlobalHeaderProps } from '../GlobalHeader';
 import { default as ResizeObserver } from 'ant-design-vue/es/vc-resize-observer';
 
 import './index.less';
-import { useRouteContext } from "../RouteContext";
+import { useRouteContext } from '../RouteContext';
 
 export type TopNavHeaderProps = SiderMenuProps & GlobalHeaderProps & PrivateSiderMenuProps & {};
 
@@ -38,22 +38,26 @@ const RightContent: FunctionalComponent<TopNavHeaderProps> = ({ rightContentRend
                 ...props,
               })}
             </div>
-          ) : rightContentRender}
+          ) : (
+            rightContentRender
+          )}
         </ResizeObserver>
       </div>
     </div>
   );
 };
 
-export const TopNavHeader: FunctionalComponent<TopNavHeaderProps> = (props, { emit }) => {
+export const TopNavHeader: FunctionalComponent<TopNavHeaderProps> = props => {
   const headerRef = ref();
   const {
     prefixCls: propPrefixCls,
     onMenuHeaderClick,
+    onOpenKeys,
+    onSelect,
     contentWidth,
     rightContentRender,
     layout,
-    ...restProps
+    menuData,
   } = props;
   const context = useRouteContext();
   const prefixCls = `${propPrefixCls || 'ant-pro'}-top-nav-header`;
@@ -65,39 +69,35 @@ export const TopNavHeader: FunctionalComponent<TopNavHeaderProps> = (props, { em
     return {
       [prefixCls]: true,
       light: props.theme === 'light',
-    }
+    };
   });
   return (
     <div class={className.value}>
-    <div ref={headerRef} class={`${prefixCls}-main ${contentWidth === 'Fixed' ? 'wide' : ''}`}>
-      {headerDom && (
-        <div class={`${prefixCls}-main-left`} onClick={onMenuHeaderClick}>
-          <div class={`${prefixCls}-logo`} key="logo" id="logo">
-            {headerDom}
+      <div ref={headerRef} class={`${prefixCls}-main ${contentWidth === 'Fixed' ? 'wide' : ''}`}>
+        {headerDom && (
+          <div class={`${prefixCls}-main-left`} onClick={onMenuHeaderClick}>
+            <div class={`${prefixCls}-logo`} key="logo" id="logo">
+              {headerDom}
+            </div>
           </div>
+        )}
+        <div style={{ flex: 1 }} class={`${prefixCls}-menu`}>
+          <BaseMenu
+            theme={props.theme === 'realDark' ? 'dark' : props.theme}
+            mode={props.mode}
+            collapsed={props.collapsed}
+            menuData={menuData}
+            openKeys={context.openKeys}
+            selectedKeys={context.selectedKeys}
+            class={{ 'top-nav-menu': props.mode === 'horizontal' }}
+            {...{
+              'onUpdate:openKeys': ($event: string[]) => onOpenKeys && onOpenKeys($event),
+              'onUpdate:selectedKeys': ($event: string[]) => onSelect && onSelect($event),
+            }}
+          />
         </div>
-      )}
-      <div style={{ flex: 1 }} class={`${prefixCls}-menu`}>
-        <BaseMenu
-          theme={props.theme === 'realDark' ? 'dark' : props.theme}
-          mode={props.mode}
-          collapsed={props.collapsed}
-          menuData={context.menuData}
-          openKeys={context.openKeys}
-          selectedKeys={context.selectedKeys}
-          class={{ 'top-nav-menu': props.mode === 'horizontal' }}
-          {...{
-            'onUpdate:openKeys': ($event: string[]) => {
-              context.onOpenKeys($event);
-            },
-            'onUpdate:selectedKeys': ($event: any) => {
-              context.onSelectedKeys($event);
-            },
-          }}
-        />
+        {rightContentRender && <RightContent rightContentRender={rightContentRender} {...props} />}
       </div>
-      {rightContentRender && <RightContent rightContentRender={rightContentRender} {...props} />}
     </div>
-  </div>
-  )
+  );
 };

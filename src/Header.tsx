@@ -1,11 +1,12 @@
-import { defineComponent, computed, toRefs, toRaw } from 'vue';
+import { defineComponent, computed, toRefs } from 'vue';
 import 'ant-design-vue/es/layout/style';
 import Layout from 'ant-design-vue/es/layout';
 
 import { GlobalHeader, GlobalHeaderProps } from './GlobalHeader';
 import { TopNavHeader } from './TopNavHeader';
+import { useRouteContext } from './RouteContext';
 import { RenderVNodeType, WithFalse } from './typings';
-import { clearMenuItem } from './utils';
+import { flatMap } from './utils';
 import './Header.less';
 
 const { Header } = Layout;
@@ -55,24 +56,37 @@ export const headerProps = [
   'navTheme',
   'onSelect',
   'onOpenChange',
-]
+];
 
 export const HeaderView = defineComponent({
   inheritAttrs: false,
   name: 'HeaderView',
   props: headerProps,
   setup(props: HeaderViewProps) {
-    const { prefixCls, headerRender, headerContentRender, isMobile, fixedHeader, hasSiderMenu, headerHeight, layout, navTheme, onCollapse } = toRefs(props);
-    console.log('HeaderView', props)
-    const isTop = computed(() => props.layout === 'top');
+    const {
+      prefixCls,
+      headerRender,
+      headerContentRender,
+      isMobile,
+      fixedHeader,
+      hasSiderMenu,
+      headerHeight,
+      layout,
+      navTheme,
+      onCollapse,
+    } = toRefs(props);
+    const context = useRouteContext();
+    const isTop = computed(() => props.layout === 'top' || props.layout === 'mix');
     const needFixedHeader = computed(() => fixedHeader.value || layout.value === 'mix');
-    const needSettingWidth = computed(() => needFixedHeader.value && hasSiderMenu.value && !isTop.value && !isMobile.value);
-    const clearMenuData = computed(() => clearMenuItem(props.menuData || []));
+    const needSettingWidth = computed(
+      () => needFixedHeader.value && hasSiderMenu.value && !isTop.value && !isMobile.value,
+    );
+    const clearMenuData = computed(() => (context.menuData && flatMap(context.menuData)) || []);
     const className = computed(() => {
       return {
         [`${prefixCls.value}-fixed-header`]: needFixedHeader.value,
         [`${prefixCls.value}-top-menu`]: isTop.value,
-      }
+      };
     });
     const renderContent = () => {
       let defaultDom = (
@@ -95,7 +109,7 @@ export const HeaderView = defineComponent({
         return headerRender.value(props, defaultDom);
       }
       return defaultDom;
-    }
+    };
 
     /**
      * 计算侧边栏的宽度，不然导致左边的样式会出问题
@@ -103,15 +117,15 @@ export const HeaderView = defineComponent({
     const width = computed(() => {
       return layout.value !== 'mix' && needSettingWidth.value
         ? `calc(100% - ${props.collapsed ? 48 : props.siderWidth}px)`
-          : '100%';
+        : '100%';
     });
-    const right = computed(() => needFixedHeader.value ? 0 : undefined);
+    const right = computed(() => (needFixedHeader.value ? 0 : undefined));
     return () => (
       <>
         {needFixedHeader.value && (
           <Header
             style={{
-              height: headerHeight.value,
+              height: `${headerHeight.value}px`,
               lineHeight: `${headerHeight.value}px`,
               background: 'transparent',
             }}

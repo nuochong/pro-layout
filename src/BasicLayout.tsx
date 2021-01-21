@@ -1,9 +1,8 @@
-import { computed, FunctionalComponent, CSSProperties, VNodeChild } from 'vue';
+import { computed, FunctionalComponent, CSSProperties, VNodeChild, VNode, ComputedRef } from 'vue';
 import 'ant-design-vue/es/layout/style';
 import Layout from 'ant-design-vue/es/layout';
 import { withInstall } from 'ant-design-vue/es/_util/type';
 import { default as ProProvider, ProProviderData } from './ProProvider';
-import { default as GlobalFooter } from './GlobalFooter';
 import { default as SiderMenuWrapper, SiderMenuWrapperProps } from './SiderMenu';
 import { WrapContent } from './WrapContent';
 import { default as Header, HeaderViewProps } from './Header';
@@ -14,41 +13,42 @@ import './BasicLayout.less';
 
 const defaultI18nRender = (key: string) => key;
 
-export type BasicLayoutProps = SiderMenuWrapperProps & HeaderViewProps & {
-  pure?: boolean;
-  /**
-   *@name logo url
-   */
-  logo?: string | RenderVNodeType | WithFalse<string | RenderVNodeType>;
+export type BasicLayoutProps = SiderMenuWrapperProps &
+  HeaderViewProps & {
+    pure?: boolean;
+    /**
+     *@name logo url
+     */
+    logo?: string | RenderVNodeType | WithFalse<string | RenderVNodeType>;
 
-  loading?: boolean;
+    loading?: boolean;
 
-  i18n?: ProProviderData['i18n'];
+    i18n?: ProProviderData['i18n'];
 
-  defaultCollapsed?: boolean;
+    defaultCollapsed?: boolean;
 
-  onCollapse?: (collapsed: boolean) => void;
+    onCollapse?: (collapsed: boolean) => void;
 
-  footerRender?: WithFalse<
-    (props: any /* FooterProps */, defaultDom: RenderVNodeType) => RenderVNodeType
-  >;
+    footerRender?: WithFalse<
+      (props: any /* FooterProps */, defaultDom: RenderVNodeType) => RenderVNodeType
+    >;
 
-  headerRender?: WithFalse<(props: any /* HeaderProps */) => RenderVNodeType>;
+    headerRender?: WithFalse<(props: any /* HeaderProps */) => RenderVNodeType>;
 
-  colSize?: string;
-  /**
-   * 是否禁用移动端模式，有的管理系统不需要移动端模式，此属性设置为true即可
-   */
-  disableMobile?: boolean;
+    colSize?: string;
+    /**
+     * 是否禁用移动端模式，有的管理系统不需要移动端模式，此属性设置为true即可
+     */
+    disableMobile?: boolean;
 
-  isChildrenLayout?: boolean;
+    isChildrenLayout?: boolean;
 
-  contentStyle?: CSSProperties;
-  /**
-   * 兼用 content的 margin
-   */
-  disableContentMargin?: boolean;
-};
+    contentStyle?: CSSProperties;
+    /**
+     * 兼用 content的 margin
+     */
+    disableContentMargin?: boolean;
+  };
 
 const ProLayout: FunctionalComponent<BasicLayoutProps> = (props, { emit, slots, attrs }) => {
   const {
@@ -73,11 +73,11 @@ const ProLayout: FunctionalComponent<BasicLayoutProps> = (props, { emit, slots, 
   const handleCollapse = (collapsed: boolean) => {
     emit('update:collapsed', collapsed);
   };
-  const handleOpenChange = (openKeys: string[] | false): void => {
-    openKeys && emit('update:openKeys', openKeys);
+  const handleOpenKeys = (openKeys: string[] | false): void => {
+    openKeys && emit('update:open-keys', openKeys);
   };
   const handleSelect = (selectedKeys: string[] | false): void => {
-    selectedKeys && emit('update:selectedKeys', selectedKeys);
+    selectedKeys && emit('update:selected-keys', selectedKeys);
   };
   const baseClassName = computed(() => `${props.prefixCls}-basicLayout`);
   // gen className
@@ -100,66 +100,75 @@ const ProLayout: FunctionalComponent<BasicLayoutProps> = (props, { emit, slots, 
     props: BasicLayoutProps & {
       hasSiderMenu: boolean;
       customHeaderRender: VNodeChild | false;
-      rightContentRender: VNodeChild | false;
+      rightContentRender: VNodeChild | VNode | false;
     },
-    matchMenuKeys: string[]
+    matchMenuKeys: string[],
   ): RenderVNodeType => {
     if (props.headerRender === false || props.pure) {
       return null;
     }
     return <Header matchMenuKeys={matchMenuKeys} {...props} headerHeight={48} />;
-  }
-  const rightContentRender = getComponentOrSlot(props, slots, 'rightContentRender');
-  const customHeaderRender = getComponentOrSlot(props, slots, 'headerRender');;
-  const headerDom = headerRender({
-    ...props,
-    hasSiderMenu: isTop.value,
-    menuData,
-    isMobile,
-    collapsed,
-    onCollapse,
-    onSelect: handleSelect,
-    onOpenChange: handleOpenChange,
-    customHeaderRender,
-    rightContentRender,
-    theme: (navTheme || 'dark').toLocaleLowerCase().includes('dark') ? 'dark' : 'light',
-  }, matchMenuKeys);
+  };
+  const rightContentRender = getComponentOrSlot(props, slots, 'rightContentRender') as any;
+  const customHeaderRender = getComponentOrSlot(props, slots, 'headerRender');
+  const menuHeaderRenderFunc = props['menuHeaderRender'];
+  const menuHeaderRenderSlot = slots['menuHeaderRender'];
+  const headerDom = headerRender(
+    {
+      ...props,
+      hasSiderMenu: !isTop.value,
+      menuData,
+      isMobile,
+      collapsed,
+      onCollapse,
+      onSelect: handleSelect,
+      onOpenKeys: handleOpenKeys,
+      customHeaderRender,
+      rightContentRender,
+      headerTitleRender:
+        menuHeaderRenderFunc || (menuHeaderRenderSlot && (() => menuHeaderRenderSlot())),
+      theme: (navTheme || 'dark').toLocaleLowerCase().includes('dark') ? 'dark' : 'light',
+    },
+    matchMenuKeys,
+  );
 
   const footerRender = getComponentOrSlot(props, slots, 'footerRender');
   const menuRender = getComponentOrSlot(props, slots, 'menuRender');
   // const menuHeaderRender = getComponentOrSlot(props, slots, 'menuHeaderRender');
-  const menuHeaderRenderFunc = props['menuHeaderRender'];
-  const menuHeaderRenderSlot = slots['menuHeaderRender'];
 
   return (
     <ProProvider i18n={defaultI18nRender}>
-      { props.pure
-        ? (slots.default?.())
-        : (
-          <div class={className.value}>
-            <Layout class={baseClassName.value}>
-              { !isTop.value && (<SiderMenuWrapper
+      {props.pure ? (
+        slots.default?.()
+      ) : (
+        <div class={className.value}>
+          <Layout class={baseClassName.value}>
+            {!isTop.value && (
+              <SiderMenuWrapper
                 {...props}
-                menuHeaderRender={menuHeaderRenderFunc || (menuHeaderRenderSlot && (() => menuHeaderRenderSlot()))}
+                menuHeaderRender={
+                  menuHeaderRenderFunc || (menuHeaderRenderSlot && (() => menuHeaderRenderSlot()))
+                }
                 onCollapse={handleCollapse}
-              />)}
-              <Layout>
-                {headerDom}
-                <WrapContent style={props.contentStyle}>
-                  {slots.default?.()}
-                </WrapContent>
-                { footerRender !== false && (footerRender && footerRender)}
-              </Layout>
+                onSelect={handleSelect}
+                onOpenKeys={handleOpenKeys}
+              />
+            )}
+            <Layout style={contentStyle}>
+              {headerDom}
+              <WrapContent style={props.contentStyle}>{slots.default?.()}</WrapContent>
+              {footerRender !== false && footerRender && footerRender}
             </Layout>
-          </div>
-        )}
+          </Layout>
+        </div>
+      )}
     </ProProvider>
   );
 };
 
 ProLayout.inheritAttrs = false;
 ProLayout.displayName = 'ProLayout';
-ProLayout.emits = ['update:collapsed', 'update:openKeys', 'update:selectedKeys'];
+ProLayout.emits = ['update:collapsed', 'update:open-keys', 'update:selected-keys'];
 ProLayout.props = {
   prefixCls: PropTypes.string.def('ant-pro'),
   title: PropTypes.VNodeChild.def('Ant Design Pro'),

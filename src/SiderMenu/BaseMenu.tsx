@@ -11,14 +11,13 @@ import {
 } from 'vue';
 import { createFromIconfontCN } from '@ant-design/icons-vue';
 import 'ant-design-vue/es/menu/style';
-import Menu, { MenuProps } from 'ant-design-vue/es/menu';
+import Menu from 'ant-design-vue/es/menu';
 import defaultSettings, { PureSettings } from '../defaultSettings';
 import { isImg, isUrl } from '../utils';
 import { MenuMode, SelectInfo, OpenEventHandler } from './typings';
 import { MenuDataItem, MenuTheme, FormatMessage, WithFalse } from '../typings';
 import { PrivateSiderMenuProps } from './SiderMenu';
 import './index.less';
-import { useMenuState } from '../hooks/useMenu';
 
 export { MenuMode, SelectInfo, OpenEventHandler };
 
@@ -78,10 +77,10 @@ const renderTitle = (title: string | undefined, i18nRender: FormatMessage) => {
 const renderMenuItem = (item: MenuDataItem, i18nRender: FormatMessage) => {
   const meta = Object.assign({}, item.meta);
   const target = meta.target || null;
-  const hasRemoteUrl = httpReg.test(item.path)
+  const hasRemoteUrl = httpReg.test(item.path);
   const CustomTag: any = resolveComponent((target && 'a') || 'router-link');
   const props = { to: { name: item.name } };
-  const attrs = (hasRemoteUrl || target) ? { href: item.path, target: target } : {};
+  const attrs = hasRemoteUrl || target ? { href: item.path, target: target } : {};
   if (item.children && item.meta?.hideChildInMenu) {
     // 把有子菜单的 并且 父菜单是要隐藏子菜单的
     // 都给子菜单增加一个 hidden 属性
@@ -117,7 +116,7 @@ const renderSubMenu = (item: MenuDataItem, i18nRender: FormatMessage) => {
 };
 
 const renderMenu = (item: MenuDataItem, i18nRender: FormatMessage) => {
-  if (item && !item.hidden) {
+  if (item && !item.meta.hidden) {
     const hasChild = item.children && !item.meta?.hideChildInMenu;
     return hasChild ? renderSubMenu(item, i18nRender) : renderMenuItem(item, i18nRender);
   }
@@ -144,7 +143,7 @@ const LazyIcon = (props: any) => {
   if (isVNode(icon)) {
     return icon;
   }
-  const LazyIcon = resolveComponent(icon);
+  const LazyIcon = resolveComponent(icon) as any;
   return (typeof LazyIcon === 'function' && <LazyIcon />) || null;
 };
 
@@ -194,7 +193,7 @@ export default defineComponent({
       >
         {props.menuData &&
           props.menuData.map(menu => {
-            if (menu.hidden) {
+            if (menu.meta.hidden) {
               return null;
             }
             return renderMenu(menu, i18n.value);
