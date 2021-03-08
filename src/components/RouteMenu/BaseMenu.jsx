@@ -12,6 +12,7 @@ const {
 
 export const RouteMenuProps = {
   menus: PropTypes.array,
+  layout: PropTypes.string,
   theme: PropTypes.string.def('dark'),
   mode: PropTypes.string.def('inline'),
   collapsed: PropTypes.bool.def(false),
@@ -29,6 +30,7 @@ const renderMenu = (h, item, i18nRender) => {
 }
 
 const renderSubMenu = (h, item, i18nRender) => {
+  
   return (
     <SubMenu key={item.path} title={(
       <span>
@@ -41,7 +43,7 @@ const renderSubMenu = (h, item, i18nRender) => {
   )
 }
 
-const renderMenuItem = (h, item, i18nRender) => {
+export const renderMenuItem = (h, item, i18nRender) => {
   const meta = Object.assign({}, item.meta)
   const target = meta.target || null
   const hasRemoteUrl = httpReg.test(item.path)
@@ -92,6 +94,7 @@ const RouteMenu = {
   },
   render (h) {
     const { mode, theme, menus, i18nRender } = this
+    
     const handleOpenChange = (openKeys) => {
       // 在水平模式下时，不再执行后续
       if (mode === 'horizontal') {

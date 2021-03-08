@@ -85,15 +85,35 @@ const SiderMenu = {
       onMenuHeaderClick = () => null,
       i18nRender,
       menuHeaderRender,
-      menuRender
+      menuRender,
+      layout,
+      isMobile
     } = this
+
     const siderCls = ['ant-pro-sider-menu-sider']
     if (fixSiderbar) siderCls.push('fix-sider-bar')
-    if (theme === 'light') siderCls.push('light')
-    //
+    let themeNew = theme
+    if (layout === 'mixmenu' && !isMobile) themeNew = 'light'
+    if (themeNew === 'light') siderCls.push('light')
+    
     // const handleCollapse = (collapsed, type) => {
     //   this.$emit('collapse', collapsed)
     // }
+
+    let menusNew = []
+    if(layout === 'mixmenu'){
+    // 处理二级以后菜单
+    const routes = this.$route.matched.concat()
+    const selectedKeys = routes[1].path
+    
+    menus.map(item=>{
+      if(item.path === selectedKeys){
+        menusNew = item.children
+      }
+    })
+    }else{
+      menusNew = menus
+    }
 
     const headerDom = defaultRenderLogoAntTitle(h, {
       logo, title, menuHeaderRender, collapsed
@@ -104,7 +124,7 @@ const SiderMenu = {
       breakpoint={'lg'}
       trigger={null}
       width={siderWidth}
-      theme={theme}
+      theme={themeNew}
       collapsible={collapsible}
       collapsed={collapsed}
     >
@@ -124,7 +144,7 @@ const SiderMenu = {
           && menuRender(h, this.$props)
           || menuRender
       ) || (
-        <BaseMenu collapsed={collapsed} menus={menus} mode={mode} theme={theme} i18nRender={i18nRender} />
+        <BaseMenu collapsed={collapsed} menus={menusNew} mode={mode} theme={themeNew} i18nRender={i18nRender} layout={layout}/>
       )}
     </Sider>)
   }

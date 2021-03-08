@@ -26,15 +26,20 @@ const BlockCheckbox = {
     const items = list || [
       {
         key: 'sidemenu',
-        url:
-          'https://gw.alipayobjects.com/zos/antfincdn/XwFOFbLkSM/LCkqqYNmvBEbokSDscrm.svg',
+        url:require('../../assets/sidemenu.svg'),
+          // 'https://gw.alipayobjects.com/zos/antfincdn/XwFOFbLkSM/LCkqqYNmvBEbokSDscrm.svg',
         title: i18n('app.setting.sidemenu'),
       },
       {
         key: 'topmenu',
-        url:
-          'https://gw.alipayobjects.com/zos/antfincdn/URETY8%24STp/KDNDBbriJhLwuqMoxcAr.svg',
+        url:require('../../assets/topmenu.svg'),
+          // 'https://gw.alipayobjects.com/zos/antfincdn/URETY8%24STp/KDNDBbriJhLwuqMoxcAr.svg',
         title: i18n('app.setting.topmenu'),
+      },
+      {
+        key: 'mixmenu',
+        url: require('../../assets/mixmenu.svg'),
+        title: i18n('app.setting.mixmenu'),
       },
     ]
 

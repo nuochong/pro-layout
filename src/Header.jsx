@@ -7,12 +7,14 @@ import PropTypes from 'ant-design-vue/es/_util/vue-types'
 import BaseMenu from './components/RouteMenu/BaseMenu'
 import { defaultRenderLogoAntTitle, SiderMenuProps } from './components/SiderMenu/SiderMenu'
 import GlobalHeader, { GlobalHeaderProps } from './components/GlobalHeader'
+import NavHeader, { NavHeaderProps } from './components/NavHeader'
 import { VueFragment } from './components'
 import { isFun } from './utils/util'
 
 const { Header } = Layout
 
 export const HeaderViewProps = {
+  ...NavHeaderProps,
   ...GlobalHeaderProps,
   ...SiderMenuProps,
   isMobile: PropTypes.bool.def(false),
@@ -29,13 +31,32 @@ export const HeaderViewProps = {
 
 const renderContent = (h, props) => {
   const isTop = props.layout === 'topmenu'
+  const isMix = props.layout === 'mixmenu'
+  
   const maxWidth = 1200 - 280 - 120
   const contentWidth = props.contentWidth === 'Fixed'
   const baseCls = 'ant-pro-top-nav-header'
   const { logo, title, theme, isMobile, headerRender, rightContentRender, menuRender, menuHeaderRender } = props
   const rightContentProps = { theme, isTop, isMobile }
   let defaultDom = <GlobalHeader {...{ props: props }} />
-  if (isTop && !isMobile) {
+  if(isMix && !isMobile){
+    defaultDom = ( <div class={[baseCls, theme]}>
+        <div class={[`${baseCls}-main`]}>
+          {menuHeaderRender && (
+            <div class={`${baseCls}-main-left`}>
+              <div class={`${baseCls}-logo`} key="logo" id="logo">
+                {defaultRenderLogoAntTitle(h, { logo, title, menuHeaderRender })}
+              </div>
+            </div>
+          )}
+          <div class={`${baseCls}-menu`} style={{ maxWidth: `${maxWidth}px`, flex: 1 }}>
+            <NavHeader {...{ props: props }} />
+          </div>
+          {isFun(rightContentRender) && rightContentRender(h, rightContentProps) || rightContentRender}
+        </div>
+      </div>
+      )
+  }else if (isTop && !isMobile) {
     defaultDom = (
       <div class={[baseCls, theme]}>
         <div class={[`${baseCls}-main`, contentWidth ? 'wide' : '']}>
@@ -73,30 +94,36 @@ const HeaderView = {
       fixedHeader,
       autoHideHeader,
       hasSiderMenu,
+      menus
     } = this.$props
     const props = this.$props
     const isTop = layout === 'topmenu'
+    const isMix = layout === 'mixmenu'
 
-    const needSettingWidth = fixedHeader && hasSiderMenu && !isTop && !isMobile
+    // mix-fix-header
+    const needSettingWidth = fixedHeader && hasSiderMenu && !isTop && !isMobile && !isMix
 
+    const isFixedHeader = isMix ? true : fixedHeader
     const className = {
-      'ant-pro-fixed-header': fixedHeader,
+      'ant-pro-fixed-header': isFixedHeader,
       'ant-pro-top-menu': isTop,
+      'ant-pro-mix-menu': isMix
     }
+    const zIndex = layout === 'mixmenu' ? 99 : 9
 
     // 没有 <></> 暂时代替写法
     return (
       visible ? (
         <VueFragment>
-          { fixedHeader && <Header />}
+          { isFixedHeader && <Header />}
           <Header
             style={{
               padding: 0,
               width: needSettingWidth
                 ? `calc(100% - ${collapsed ? 80 : siderWidth}px)`
                 : '100%',
-              zIndex: 9,
-              right: fixedHeader ? 0 : undefined
+              zIndex: zIndex,
+              right: isFixedHeader ? 0 : undefined
             }}
             class={className}
           >

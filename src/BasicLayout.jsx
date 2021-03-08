@@ -25,6 +25,7 @@ export const BasicLayoutProps = {
   mediaQuery: PropTypes.object.def({}),
   handleMediaQuery: PropTypes.func,
   footerRender: PropTypes.oneOfType([PropTypes.func, PropTypes.bool]).def(undefined),
+  multiTab: PropTypes.bool.def(false),
 }
 
 const MediaQueryEnum = {
@@ -88,6 +89,7 @@ const BasicLayout = {
       handleCollapse,
       siderWidth,
       fixSiderbar,
+      multiTab,
       i18nRender = defaultI18nRender
     } = props
 
@@ -116,8 +118,10 @@ const BasicLayout = {
       menuRender
     }
 
+    console.log('cdProps',props)
+    const contentWidthNew = layout === 'mixmenu' ? 'Fluid' : props.contentWidth
     return (
-      <ConfigProvider i18nRender={i18nRender} contentWidth={props.contentWidth} breadcrumbRender={breadcrumbRender}>
+      <ConfigProvider i18nRender={i18nRender} contentWidth={contentWidthNew} breadcrumbRender={breadcrumbRender}>
         <ContainerQuery query={MediaQueryEnum} onChange={handleMediaQuery}>
           <Layout class={{
             'ant-pro-basicLayout': true,
@@ -129,7 +133,8 @@ const BasicLayout = {
               collapsed={collapsed}
               onCollapse={handleCollapse}
             />
-            <Layout class={[layout]} style={{
+            <Layout 
+            class={[layout]} style={{
               paddingLeft: hasSiderMenu
                 ? `${getPaddingLeft(!!hasLeftPadding, collapsed, siderWidth)}px`
                 : undefined,
@@ -139,7 +144,8 @@ const BasicLayout = {
                 ...cdProps,
                 mode: 'horizontal',
               })}
-              <WrapContent class="ant-pro-basicLayout-content" contentWidth={props.contentWidth}>
+              { multiTab && <multi-tab i18nRender={i18nRender}></multi-tab> }
+              <WrapContent class="ant-pro-basicLayout-content" contentWidth={contentWidthNew}>
                 {children}
               </WrapContent>
               { footerRender !== false && (

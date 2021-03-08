@@ -24,7 +24,7 @@ export const LayoutSettingProps = {
   contentWidth: PropTypes.oneOf(['Fluid', 'Fixed']).def('Fluid'),
   fixedHeader: PropTypes.bool,
   fixSiderbar: PropTypes.bool,
-  layout: PropTypes.oneOf(['sidemenu', 'topmenu']),
+  layout: PropTypes.oneOf(['sidemenu', 'topmenu','mixmenu']),
 
   i18nRender: PropTypes.oneOfType([PropTypes.func, PropTypes.bool]).def(false),
 }
@@ -53,7 +53,7 @@ export default {
                 onSelect={(value) => handleChange('contentWidth', value)}
                 style={{ width: '80px' }}
                 >
-                {layout === 'sidemenu' ? null : (
+                {layout === 'sidemenu' || layout === 'mixmenu' ? null : (
                   <Select.Option value="Fixed">
                     {i18n('app.setting.content-width.fixed')}
                   </Select.Option>
@@ -69,6 +69,7 @@ export default {
           action: (
           <Switch
           size="small"
+          disabled={layout === 'mixmenu'}
           checked={!!fixedHeader}
           onChange={(checked) => handleChange('fixedHeader', checked)}
           />

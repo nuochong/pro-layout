@@ -152,8 +152,9 @@ const genCopySettingJson = (settings) =>
 export const settings = {
   theme: PropTypes.oneOf(['dark', 'light', 'realDark']),
   primaryColor: PropTypes.string,
-  layout: PropTypes.oneOf(['sidemenu', 'topmenu']),
+  layout: PropTypes.oneOf(['sidemenu', 'topmenu','mixmenu']),
   colorWeak: PropTypes.bool,
+  multiTab: PropTypes.bool,
   contentWidth: PropTypes.oneOf(['Fluid', 'Fixed']).def('Fluid'),
   // 替换兼容 PropTypes.oneOf(['Fluid', 'Fixed']).def('Fluid')
   // contentWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]).def('Fluid'),
@@ -195,12 +196,16 @@ const SettingDrawer = {
       contentWidth,
       hideHintAlert,
       hideCopyButton,
-      colorWeak
+      colorWeak,
+      multiTab
     } = settings
 
     const i18n = this.$props.i18nRender || this.locale || defaultI18nRender
     const themeList = getThemeList(i18n)
     const isTopMenu = layout === 'topmenu'
+    const isMixMenu = layout === 'mixmenu'
+    let contentWidthNew = contentWidth
+    if(isMixMenu) contentWidthNew = 'Fluid'
 
     const iconStyle = {
       color: '#fff',
@@ -266,7 +271,7 @@ const SettingDrawer = {
 
           <LayoutSetting
             i18nRender={i18n}
-            contentWidth={contentWidth}
+            contentWidth={contentWidthNew}
             fixedHeader={fixedHeader}
             fixSiderbar={isTopMenu ? false : fixSiderbar}
             layout={layout}
@@ -288,6 +293,22 @@ const SettingDrawer = {
                       size="small"
                       checked={!!colorWeak}
                       onChange={(checked) => changeSetting('colorWeak', checked)}
+                    />
+                  ),
+                },
+              ]}
+            />
+            <List
+              split={false}
+              renderItem={(item) => renderLayoutSettingItem(h, item)}
+              dataSource={[
+                {
+                  title: i18n('app.setting.multitab'),
+                  action: (
+                    <Switch
+                      size="small"
+                      checked={!!multiTab}
+                      onChange={(checked) => changeSetting('multiTab', checked)}
                     />
                   ),
                 },
