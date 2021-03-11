@@ -26,13 +26,16 @@ export const HeaderViewProps = {
   headerRender: PropTypes.any,
   rightContentRender: PropTypes.any,
   visible: PropTypes.bool.def(true),
+  splitMenus: PropTypes.bool.def(true),
+  regionalSettingsMenuHeader: PropTypes.bool.def(true),
 }
 
 
 const renderContent = (h, props) => {
   const isTop = props.layout === 'topmenu'
   const isMix = props.layout === 'mixmenu'
-  
+  const isSplitMenus = props.splitMenus
+  const regionalSettingsMenuHeader = props.regionalSettingsMenuHeader
   const maxWidth = 1200 - 280 - 120
   const contentWidth = props.contentWidth === 'Fixed'
   const baseCls = 'ant-pro-top-nav-header'
@@ -50,7 +53,7 @@ const renderContent = (h, props) => {
             </div>
           )}
           <div class={`${baseCls}-menu`} style={{ maxWidth: `${maxWidth}px`, flex: 1 }}>
-            <NavHeader {...{ props: props }} />
+            { isSplitMenus && <NavHeader {...{ props: props }} /> }
           </div>
           {isFun(rightContentRender) && rightContentRender(h, rightContentProps) || rightContentRender}
         </div>
@@ -60,7 +63,7 @@ const renderContent = (h, props) => {
     defaultDom = (
       <div class={[baseCls, theme]}>
         <div class={[`${baseCls}-main`, contentWidth ? 'wide' : '']}>
-          {menuHeaderRender && (
+          {regionalSettingsMenuHeader && menuHeaderRender && (
             <div class={`${baseCls}-left`}>
               <div class={`${baseCls}-logo`} key="logo" id="logo">
                 {defaultRenderLogoAntTitle(h, { logo, title, menuHeaderRender })}
@@ -92,8 +95,10 @@ const HeaderView = {
       collapsed,
       siderWidth,
       fixedHeader,
+      splitMenus,
       autoHideHeader,
       hasSiderMenu,
+      regionalSettingsMenuHeader,
       menus
     } = this.$props
     const props = this.$props

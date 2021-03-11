@@ -6,6 +6,9 @@ import Layout from 'ant-design-vue/es/layout'
 import { isFun } from '../../utils/util'
 import BaseMenu from '../RouteMenu'
 
+import 'ant-design-vue/es/icon/style'
+import Icon from 'ant-design-vue/es/icon'
+
 const { Sider } = Layout
 
 export const SiderMenuProps = {
@@ -23,6 +26,8 @@ export const SiderMenuProps = {
   fixSiderbar: PropTypes.bool,
   logo: PropTypes.any,
   title: PropTypes.string.def(''),
+  splitMenus: PropTypes.bool,
+  regionalSettingsMenuHeader: PropTypes.bool,
   // render function or vnode
   menuHeaderRender: PropTypes.oneOfType([PropTypes.func, PropTypes.array, PropTypes.object, PropTypes.bool]),
   menuRender: PropTypes.oneOfType([PropTypes.func, PropTypes.array, PropTypes.object, PropTypes.bool]),
@@ -42,10 +47,11 @@ export const defaultRenderLogoAntTitle = (h, props) => {
   const {
     logo = 'https://gw.alipayobjects.com/zos/antfincdn/PmY%24TNNDBI/logo.svg',
     title,
-    menuHeaderRender
+    menuHeaderRender,
+    regionalSettingsMenuHeader
   } = props
 
-  if (menuHeaderRender === false) {
+  if (menuHeaderRender === false || regionalSettingsMenuHeader === false) {
     return null
   }
   const logoDom = defaultRenderLogo(h, logo)
@@ -77,6 +83,8 @@ const SiderMenu = {
       collapsed,
       siderWidth,
       fixSiderbar,
+      splitMenus,
+      regionalSettingsMenuHeader,
       mode,
       theme,
       menus,
@@ -90,7 +98,7 @@ const SiderMenu = {
       isMobile
     } = this
 
-    const siderCls = ['ant-pro-sider-menu-sider']
+    const siderCls = ['ant-pro-sider-menu-sider','ant-pro-sider-fixed']
     if (fixSiderbar) siderCls.push('fix-sider-bar')
     let themeNew = theme
     if (layout === 'mixmenu' && !isMobile) themeNew = 'light'
@@ -101,7 +109,7 @@ const SiderMenu = {
     // }
 
     let menusNew = []
-    if(layout === 'mixmenu'){
+    if(layout === 'mixmenu' && splitMenus){
     // 处理二级以后菜单
     const routes = this.$route.matched.concat()
     const selectedKeys = routes[1].path
@@ -116,7 +124,7 @@ const SiderMenu = {
     }
 
     const headerDom = defaultRenderLogoAntTitle(h, {
-      logo, title, menuHeaderRender, collapsed
+      logo, title, menuHeaderRender, collapsed,regionalSettingsMenuHeader
     })
 
     return (<Sider
@@ -139,6 +147,7 @@ const SiderMenu = {
           </router-link>
         </div>
       )}
+      <div style="flex: 1 1 0%; overflow: hidden auto;">
       {menuRender && (
         isFun(menuRender)
           && menuRender(h, this.$props)
@@ -146,6 +155,14 @@ const SiderMenu = {
       ) || (
         <BaseMenu collapsed={collapsed} menus={menusNew} mode={mode} theme={themeNew} i18nRender={i18nRender} layout={layout}/>
       )}
+      </div>
+      {/* <div class="ant-pro-sider-links">
+        <ul role="menu" class="ant-pro-sider-link-menu ant-menu-dark ant-menu-root ant-menu ant-menu-inline">
+          <li role="menuitem" class="ant-pro-sider-collapsed-button ant-menu-item" style="padding-left: 16px;">
+            <Icon type={collapsed ? 'menu-unfold' : 'menu-fold'} />
+          </li>
+        </ul>
+      </div> */}
     </Sider>)
   }
 }

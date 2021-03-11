@@ -26,6 +26,13 @@ export const BasicLayoutProps = {
   handleMediaQuery: PropTypes.func,
   footerRender: PropTypes.oneOfType([PropTypes.func, PropTypes.bool]).def(undefined),
   multiTab: PropTypes.bool.def(false),
+  splitMenus: PropTypes.bool.def(true),
+  footer: PropTypes.bool.def(true),
+  regionalSettingsMenu: PropTypes.bool.def(true),
+  regionalSettingsMenuHeader: PropTypes.bool.def(true),
+  regionalSettingsHeader: PropTypes.bool.def(true),
+  multiTabFixed: PropTypes.bool.def(false),
+  transitionName: PropTypes.oneOf(['null', 'slideUpload', 'slideRight','fadeIn','zoom']).def('null'),
 }
 
 const MediaQueryEnum = {
@@ -89,8 +96,16 @@ const BasicLayout = {
       handleCollapse,
       siderWidth,
       fixSiderbar,
+      splitMenus,
+      footer,
+      regionalSettingsMenu,
       multiTab,
-      i18nRender = defaultI18nRender
+      regionalSettingsMenuHeader,
+      regionalSettingsHeader,
+      transitionName,
+      i18nRender = defaultI18nRender,
+      fixedHeader,
+      multiTabFixed
     } = props
 
     const footerRender = getComponentFromProp(content, 'footerRender')
@@ -128,11 +143,11 @@ const BasicLayout = {
             'ant-pro-topmenu': isTopMenu,
             ...mediaQuery
           }}>
-            <SiderMenuWrapper
+            { regionalSettingsMenu && <SiderMenuWrapper
               { ...{ props: cdProps } }
               collapsed={collapsed}
               onCollapse={handleCollapse}
-            />
+            /> }
             <Layout 
             class={[layout]} style={{
               paddingLeft: hasSiderMenu
@@ -140,15 +155,18 @@ const BasicLayout = {
                 : undefined,
               minHeight: '100vh'
             }}>
-              {headerRender(h, {
+              {regionalSettingsHeader && headerRender(h, {
                 ...cdProps,
                 mode: 'horizontal',
               })}
-              { multiTab && <multi-tab i18nRender={i18nRender}></multi-tab> }
-              <WrapContent class="ant-pro-basicLayout-content" contentWidth={contentWidthNew}>
+              { multiTabFixed && <div class="ant-pro-multi-tab-fixed"></div> }
+              { multiTab && <multi-tab i18nRender={i18nRender} layout={layout} 
+              fixedHeader={fixedHeader} hasSiderMenu={hasSiderMenu} isMobile={isMobile}
+              collapsed={collapsed} siderWidth={siderWidth} multiTabFixed={multiTabFixed} regionalSettingsMenu={regionalSettingsMenu}></multi-tab> }
+              { <WrapContent class="ant-pro-basicLayout-content" contentWidth={contentWidthNew} >
                 {children}
-              </WrapContent>
-              { footerRender !== false && (
+              </WrapContent>}
+              { footer && footerRender !== false && (
                 <Layout.Footer>
                   { isFun(footerRender) && footerRender(h) || footerRender }
                 </Layout.Footer>

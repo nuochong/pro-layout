@@ -4,7 +4,7 @@ import 'ant-design-vue/es/layout/style'
 import Layout from 'ant-design-vue/es/layout'
 import ConfigProvider from 'ant-design-vue/es/config-provider'
 import GridContent from './components/GridContent'
-
+import events from './components/MultiTab/events'
 const { Content } = Layout
 
 const WrapContentProps = {
@@ -17,13 +17,26 @@ const WrapContentProps = {
 const WrapContent = {
   name: 'WrapContent',
   props: WrapContentProps,
+  data(){
+    return {
+      isRouterAlive:true
+    }
+  },
+  mounted(){
+    events.$on('reload',()=>{
+      this.isRouterAlive = false
+      this.$nextTick( ()=> {
+        this.isRouterAlive = true
+      })
+    })
+  },
   render (h) {
     const {
       isChildrenLayout,
       contentWidth
     } = this.$props
     return (
-      <Content>
+      this.isRouterAlive && <Content>
         <ConfigProvider
           getPopupContainer={(el, dialogContext) => {
             if (isChildrenLayout) {

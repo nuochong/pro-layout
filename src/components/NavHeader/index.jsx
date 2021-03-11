@@ -44,16 +44,16 @@ const NavHeader = {
     }
 
     const onClick  = ({ item, key, keyPath })=>{
-      console.log('点击了一级菜单',item, key, keyPath)
+      console.log('item, key, keyPath',item, key, keyPath)
     }
 
     const onSelect = ({ item, key, selectedKeys })=>{
-      console.log('选择了一级菜单',item, key, selectedKeys)
+      console.log('item, key, selectedKeys',item, key, selectedKeys)
       this.$router.push({path:key})
     }
 
     const onOpenChange = (openKeys)=>{
-      console.log('触发了一级菜单',openKeys)
+      console.log('openKeys',openKeys)
       
     }
 

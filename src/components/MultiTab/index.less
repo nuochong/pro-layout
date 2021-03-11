@@ -30,3 +30,48 @@
   max-width: 100%;
   margin: 0 auto;
 }
+
+.anticon.anticon-reload.ant-pro-multi-tab-reload-btn {
+  margin-left: 8px;
+  color: rgba(0,0,0,.45);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.anticon-spin,
+.anticon-spin:before {
+  display: inline-block;
+  -webkit-animation: loadingCircle 1s linear infinite;
+  animation: loadingCircle 1s linear infinite;
+}
+@-webkit-keyframes loadingCircle {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.ant-pro-multi-tab-wrap-fixed {
+  position: fixed;
+  top: 64px;
+  right: 0;
+  z-index: 9;
+  width: 100%;
+  height: 62px;
+  transition: width .2s;
+}
+.ant-pro-multi-tab-fixed {
+  width: 100%;
+  height: 62px;
+  background: transparent;
+}
+
+.ant-tabs.ant-tabs-card .ant-tabs-extra-content .ant-pro-multi-tab-dropdown-menu-btn {
+  margin-right: 8px;
+  padding: 12px;
+  font-size: 16px;
+  color: rgba(0,0,0,.45);
+  cursor: pointer;
+  svg {
+    transform: rotate(90deg);
+  }
+}

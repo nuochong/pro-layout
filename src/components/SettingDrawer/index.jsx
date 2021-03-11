@@ -29,6 +29,9 @@ import antPortal from 'ant-design-vue/es/_util/portalDirective'
 import 'ant-design-vue/es/message/style'
 import message from 'ant-design-vue/es/message'
 
+import 'ant-design-vue/es/select/style'
+import Select from 'ant-design-vue/es/select'
+
 import BlockCheckbox from './BlockCheckbox'
 import ThemeColor from './ThemeColor'
 import LayoutSetting, { renderLayoutSettingItem } from './LayoutChange'
@@ -161,7 +164,14 @@ export const settings = {
   fixedHeader: PropTypes.bool,
   fixSiderbar: PropTypes.bool,
   hideHintAlert: PropTypes.bool.def(false),
-  hideCopyButton: PropTypes.bool.def(false)
+  hideCopyButton: PropTypes.bool.def(false),
+  splitMenus: PropTypes.bool,
+  regionalSettingsMenu: PropTypes.bool,
+  regionalSettingsMenuHeader: PropTypes.bool,
+  regionalSettingsHeader: PropTypes.bool,
+  multiTabFixed: PropTypes.bool,
+  footer: PropTypes.bool,
+  transitionName: PropTypes.oneOf(['null', 'slideUpload', 'slideRight','fadeIn','zoom']).def('null'),
 }
 
 export const SettingDrawerProps = {
@@ -193,6 +203,13 @@ const SettingDrawer = {
       layout = 'sidemenu',
       fixedHeader = false,
       fixSiderbar = false,
+      splitMenus = true,
+      footer = true,
+      regionalSettingsMenu = true,
+      regionalSettingsMenuHeader = true,
+      regionalSettingsHeader = true,
+      multiTabFixed = false,
+      transitionName = 'null',
       contentWidth,
       hideHintAlert,
       hideCopyButton,
@@ -274,6 +291,7 @@ const SettingDrawer = {
             contentWidth={contentWidthNew}
             fixedHeader={fixedHeader}
             fixSiderbar={isTopMenu ? false : fixSiderbar}
+            splitMenus={splitMenus}
             layout={layout}
             onChange={({ type, value }) => {
               changeSetting(type, value)
@@ -281,7 +299,110 @@ const SettingDrawer = {
           />
           <Divider />
 
+          <Body title={i18n('app.setting.regionalsettings')}>
+            <List
+              split={false}
+              renderItem={(item) => renderLayoutSettingItem(h, item)}
+              dataSource={[
+                {
+                  title: i18n('app.setting.regionalsettings.header'),
+                  action: (
+                    <Switch
+                      size="small"
+                      checked={!!regionalSettingsHeader}
+                      onChange={(checked) => changeSetting('regionalSettingsHeader', checked)}
+                    />
+                  ),
+                },
+              ]}
+            />
+            <List
+              split={false}
+              renderItem={(item) => renderLayoutSettingItem(h, item)}
+              dataSource={[
+                {
+                  title: i18n('app.setting.regionalsettings.menu'),
+                  action: (
+                    <Switch
+                      size="small"
+                      checked={!!regionalSettingsMenu}
+                      onChange={(checked) => changeSetting('regionalSettingsMenu', checked)}
+                    />
+                  ),
+                },
+              ]}
+            />
+            <List
+              split={false}
+              renderItem={(item) => renderLayoutSettingItem(h, item)}
+              dataSource={[
+                {
+                  title: i18n('app.setting.regionalsettings.footer'),
+                  action: (
+                    <Switch
+                      size="small"
+                      checked={!!footer}
+                      onChange={(checked) => changeSetting('footer', checked)}
+                    />
+                  ),
+                },
+              ]}
+            />
+            <List
+              split={false}
+              renderItem={(item) => renderLayoutSettingItem(h, item)}
+              dataSource={[
+                {
+                  title: i18n('app.setting.regionalsettings.menuHeader'),
+                  action: (
+                    <Switch
+                      disabled={isMixMenu}
+                      size="small"
+                      checked={!!regionalSettingsMenuHeader}
+                      onChange={(checked) => changeSetting('regionalSettingsMenuHeader', checked)}
+                    />
+                  ),
+                },
+              ]}
+            />
+          </Body>
+
+          <Divider />
+
           <Body title={i18n('app.setting.othersettings')}>
+          {/* <List
+              split={false}
+              renderItem={(item) => renderLayoutSettingItem(h, item)}
+              dataSource={[
+                {
+                  title: i18n('app.setting.transition-name'),
+                  action: (
+                    <Select
+                      value={transitionName}
+                      size="small"
+                      onSelect={(value) => changeSetting('transitionName', value)}
+                      style={{ width: '100px' }}
+                      >
+                      <Select.Option value="null">
+                        {i18n('app.setting.transition-name.null')}
+                      </Select.Option>
+                      <Select.Option value="slideUpload">
+                        {i18n('app.setting.transition-name.slide-upload')}
+                      </Select.Option>
+                      <Select.Option value="slideRight">
+                        {i18n('app.setting.transition-name.slide-right')}
+                      </Select.Option>
+                      <Select.Option value="fadeIn">
+                        {i18n('app.setting.transition-name.fade-in')}
+                      </Select.Option>
+                      <Select.Option value="zoom">
+                        {i18n('app.setting.transition-name.zoom')}
+                      </Select.Option>
+                </Select>
+                ),
+              }
+              ]}
+            /> */}
             <List
               split={false}
               renderItem={(item) => renderLayoutSettingItem(h, item)}
@@ -309,6 +430,25 @@ const SettingDrawer = {
                       size="small"
                       checked={!!multiTab}
                       onChange={(checked) => changeSetting('multiTab', checked)}
+                    />
+                  ),
+                },
+              ]}
+            />
+            <List
+              split={false}
+              renderItem={(item) => renderLayoutSettingItem(h, item)}
+              dataSource={[
+                {
+                  title: i18n('app.setting.multi-tab-fixed'),
+                  disabled: fixedHeader === false,
+                  disabledReason: i18n('app.setting.multi-tab-fixed.hint'),
+                  action: (
+                    <Switch
+                      size="small"
+                      disabled={fixedHeader === false}
+                      checked={!!multiTabFixed}
+                      onChange={(checked) => changeSetting('multiTabFixed', checked)}
                     />
                   ),
                 },

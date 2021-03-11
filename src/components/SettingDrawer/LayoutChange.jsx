@@ -11,8 +11,10 @@ import Switch from 'ant-design-vue/es/switch'
 
 export const renderLayoutSettingItem = (h, item) => {
   const action = {...item.action}
+  // const showTooltip = !!item.disabled ? '' : item.disabledReason
   return (
     <Tooltip title={item.disabled ? item.disabledReason : ''} placement="left">
+    {/*<Tooltip title={showTooltip} placement="left">*/}
       <List.Item actions={[action]}>
         <span style={{ opacity: item.disabled ? 0.5 : 1 }}>{item.title}</span>
       </List.Item>
@@ -24,6 +26,7 @@ export const LayoutSettingProps = {
   contentWidth: PropTypes.oneOf(['Fluid', 'Fixed']).def('Fluid'),
   fixedHeader: PropTypes.bool,
   fixSiderbar: PropTypes.bool,
+  splitMenus: PropTypes.bool,
   layout: PropTypes.oneOf(['sidemenu', 'topmenu','mixmenu']),
 
   i18nRender: PropTypes.oneOfType([PropTypes.func, PropTypes.bool]).def(false),
@@ -34,7 +37,7 @@ export default {
   inject: ['locale'],
   render (h) {
     const i18n = this.$props.i18nRender || this.locale
-    const { contentWidth, fixedHeader, layout, fixSiderbar } = this
+    const { contentWidth, fixedHeader, layout, fixSiderbar,splitMenus } = this
 
     const handleChange = (type, value) => {
       this.$emit('change', { type, value })
@@ -85,6 +88,19 @@ export default {
             disabled={layout === 'topmenu'}
             checked={!!fixSiderbar}
             onChange={(checked) => handleChange('fixSiderbar', checked)}
+          />
+          ),
+        },
+        {
+          title: i18n('app.setting.splitMenus'),
+          disabled: layout === 'topmenu' || layout === 'sidemenu',
+          disabledReason: i18n('app.setting.splitMenus.hint'),
+          action: (
+          <Switch
+            size="small"
+            disabled={layout === 'topmenu' || layout === 'sidemenu'}
+            checked={!!splitMenus}
+            onChange={(checked) => handleChange('splitMenus', checked)}
           />
           ),
         },
