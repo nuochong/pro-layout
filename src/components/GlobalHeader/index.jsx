@@ -1,11 +1,9 @@
 import './index.less'
 
-import debounce from 'lodash/debounce'
 import PropTypes from 'ant-design-vue/es/_util/vue-types'
 import { triggerEvent, inBrowser, isFun } from '../../utils/util'
-import 'ant-design-vue/es/icon/style'
-import Icon from 'ant-design-vue/es/icon'
 import { defaultRenderLogo } from '../SiderMenu/SiderMenu'
+import menu,{toggle,renderCollapsedButton} from '../../mixins/menu'
 
 export const GlobalHeaderProps = {
   collapsed: PropTypes.bool,
@@ -19,35 +17,12 @@ export const GlobalHeaderProps = {
   rightContentRender: PropTypes.any,
 }
 
-const defaultRenderCollapsedButton = (h, collapsed) => (
-  <Icon type={collapsed ? 'menu-unfold' : 'menu-fold'}/>
-)
-
 const GlobalHeader = {
   name: 'GlobalHeader',
   props: GlobalHeaderProps,
+  mixins:[menu],
   render (h) {
     const { isMobile, logo, rightContentRender, headerContentRender } = this.$props
-    const toggle = () => {
-      const { collapsed, handleCollapse } = this.$props
-      if (handleCollapse) handleCollapse(!collapsed)
-      this.triggerResizeEvent()
-    }
-    const renderCollapsedButton = () => {
-      const {
-        collapsed,
-        collapsedButtonRender = defaultRenderCollapsedButton,
-        menuRender
-      } = this.$props
-      if (collapsedButtonRender !== false && menuRender !== false) {
-        return (
-          <span class="ant-pro-global-header-trigger" onClick={toggle}>
-            {isFun(collapsedButtonRender) && collapsedButtonRender(h, collapsed) || collapsedButtonRender}
-          </span>
-        )
-      }
-      return null
-    }
 
     const headerCls = 'ant-pro-global-header'
 
@@ -58,7 +33,7 @@ const GlobalHeader = {
             {defaultRenderLogo(h, logo)}
           </a>
         )}
-        {renderCollapsedButton()}
+        {renderCollapsedButton(h,this,'header')}
         {headerContentRender && (
           <div class={`${headerCls}-content`}>
             {isFun(headerContentRender) && headerContentRender(h, this.$props) || headerContentRender}
@@ -68,14 +43,6 @@ const GlobalHeader = {
       </div>
     )
   },
-  methods: {
-    triggerResizeEvent: debounce(() => {
-      inBrowser && triggerEvent(window, 'resize')
-    })
-  },
-  beforeDestroy () {
-    this.triggerResizeEvent.cancel && this.triggerResizeEvent.cancel()
-  }
 }
 
 export default GlobalHeader

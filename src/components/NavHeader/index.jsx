@@ -20,14 +20,15 @@ export const NavHeaderProps = {
   rightContentRender: PropTypes.any,
   menus:PropTypes.array,
   i18nRender: PropTypes.oneOfType([PropTypes.func, PropTypes.bool]).def(false),
-
+  theme: PropTypes.string.def('dark'),
+  // layout: PropTypes.string.def('inline'),
 }
 
 const NavHeader = {
   name: 'NavHeader',
   props: NavHeaderProps,
   render (h) {
-    const { isMobile, logo, rightContentRender, headerContentRender,i18nRender } = this.$props
+    const { isMobile, logo, rightContentRender, headerContentRender,i18nRender,theme } = this.$props
 
     // 一级菜单名称
     const getFirstLevel = (value) =>{
@@ -78,7 +79,7 @@ const NavHeader = {
 
     return (
       <a-menu
-        theme="dark"
+        theme={theme}
         mode="horizontal"
         default-selected-keys={['2']}
         style={{ lineHeight: '64px' }}

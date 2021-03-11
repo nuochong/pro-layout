@@ -27,6 +27,7 @@ export const HeaderViewProps = {
   rightContentRender: PropTypes.any,
   visible: PropTypes.bool.def(true),
   splitMenus: PropTypes.bool.def(true),
+  regionalSettingsMenu: PropTypes.bool.def(true),
   regionalSettingsMenuHeader: PropTypes.bool.def(true),
 }
 
@@ -98,6 +99,7 @@ const HeaderView = {
       splitMenus,
       autoHideHeader,
       hasSiderMenu,
+      regionalSettingsMenu,
       regionalSettingsMenuHeader,
       menus
     } = this.$props
@@ -124,7 +126,7 @@ const HeaderView = {
           <Header
             style={{
               padding: 0,
-              width: needSettingWidth
+              width: needSettingWidth && regionalSettingsMenu
                 ? `calc(100% - ${collapsed ? 80 : siderWidth}px)`
                 : '100%',
               zIndex: zIndex,

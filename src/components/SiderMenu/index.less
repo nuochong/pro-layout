@@ -125,33 +125,37 @@
 }
 
 
-.ant-menu-root::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
 .ant-layout-sider {
-  .ant-menu-root::-webkit-scrollbar-thumb {
-    border-radius: 3px;
-    -webkit-box-shadow: inset 0 0 5px rgb(0 21 41 / 5%);
-    background: rgba(0,0,0,.12);
-  }
-  .ant-menu-root::-webkit-scrollbar-track {
-    border-radius: 3px;
-    -webkit-box-shadow: inset 0 0 5px rgb(0 21 41 / 5%);
-    background: rgba(0,0,0,.06);
+  .ant-layout-sider-children {
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      border-radius: 3px;
+      -webkit-box-shadow: inset 0 0 5px rgb(0 21 41 / 5%);
+      background: rgba(0,0,0,.12);
+    }
+    ::-webkit-scrollbar-track {
+      border-radius: 3px;
+      -webkit-box-shadow: inset 0 0 5px rgb(0 21 41 / 5%);
+      background: rgba(0,0,0,.06);
+    }
   }
 }
 
 .ant-layout-sider.ant-layout-sider-dark {
-  .ant-menu-root::-webkit-scrollbar-thumb {
-    background: hsla(0,0%,100%,.2);
-    border-radius: 3px;
-    -webkit-box-shadow: inset 0 0 5px hsl(0deg 0% 100% / 5%);
-  }
-  .ant-menu-root::-webkit-scrollbar-track {
-    background: hsla(0,0%,100%,.15);
-    border-radius: 3px;
-    -webkit-box-shadow: inset 0 0 5px rgb(37 37 37 / 5%);
+  .ant-layout-sider-children {
+    ::-webkit-scrollbar-thumb {
+      background: hsla(0,0%,100%,.2);
+      border-radius: 3px;
+      -webkit-box-shadow: inset 0 0 5px hsl(0deg 0% 100% / 5%);
+    }
+    ::-webkit-scrollbar-track {
+      background: hsla(0,0%,100%,.15);
+      border-radius: 3px;
+      -webkit-box-shadow: inset 0 0 5px rgb(37 37 37 / 5%);
+    }
   }
 }
 
@@ -162,19 +166,52 @@
 .ant-pro-sider-links ul.ant-menu-root {
   height: auto;
 }
-
-.ant-layout-sider-children {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+.ant-pro-sider-menu-sider {
+  .ant-layout-sider-children {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    .ant-menu-root {
+      height: auto;
+      overflow-y: auto;
+    }
+  }
 }
-.ant-pro-sider.ant-layout-sider.ant-pro-sider-fixed {
+
+.ant-layout-sider.ant-pro-sider-fixed {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 100;
+  z-index: 10;
   height: 100%;
   overflow: auto;
   overflow-x: hidden;
   box-shadow: 2px 0 8px 0 rgb(29 35 41 / 5%);
+
+  overflow: hidden;
+}
+
+.ant-pro-basicLayout {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
+}
+.ant-layout.ant-layout-has-sider {
+  flex-direction: row;
+}
+
+.ant-pro-sider-light {
+  .ant-menu-light {
+    border-right-color: transparent;
+  }
+  .ant-pro-sider-collapsed-button {
+    border-top: 1px solid #f0f0f0;
+  }
+} 
+
+
+.ant-pro-sider-menu-sider.light .ant-pro-sider-menu-logo {
+  background: white;
+  box-shadow: none; 
 }

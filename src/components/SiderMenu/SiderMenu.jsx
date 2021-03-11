@@ -9,6 +9,8 @@ import BaseMenu from '../RouteMenu'
 import 'ant-design-vue/es/icon/style'
 import Icon from 'ant-design-vue/es/icon'
 
+import menu,{toggle,renderCollapsedButton} from '../../mixins/menu'
+
 const { Sider } = Layout
 
 export const SiderMenuProps = {
@@ -31,6 +33,7 @@ export const SiderMenuProps = {
   // render function or vnode
   menuHeaderRender: PropTypes.oneOfType([PropTypes.func, PropTypes.array, PropTypes.object, PropTypes.bool]),
   menuRender: PropTypes.oneOfType([PropTypes.func, PropTypes.array, PropTypes.object, PropTypes.bool]),
+  collapsedButtonRender: PropTypes.any,
 }
 
 export const defaultRenderLogo = (h, logo) => {
@@ -77,6 +80,7 @@ const SiderMenu = {
     event: 'collapse'
   },
   props: SiderMenuProps,
+  mixins: [menu],
   render (h) {
     const {
       collapsible,
@@ -94,16 +98,23 @@ const SiderMenu = {
       i18nRender,
       menuHeaderRender,
       menuRender,
+      collapsedButtonRender,
       layout,
       isMobile
     } = this
 
-    const siderCls = ['ant-pro-sider-menu-sider','ant-pro-sider-fixed']
-    if (fixSiderbar) siderCls.push('fix-sider-bar')
+    const siderCls = ['ant-pro-sider-menu-sider']
+    if (fixSiderbar) {
+      siderCls.push('fix-sider-bar')
+      siderCls.push('ant-pro-sider-fixed')
+    }
     let themeNew = theme
     if (layout === 'mixmenu' && !isMobile) themeNew = 'light'
-    if (themeNew === 'light') siderCls.push('light')
-    
+    if (themeNew === 'light'){
+      siderCls.push('light')
+      siderCls.push('ant-pro-sider-light')
+    } 
+
     // const handleCollapse = (collapsed, type) => {
     //   this.$emit('collapse', collapsed)
     // }
@@ -126,6 +137,14 @@ const SiderMenu = {
     const headerDom = defaultRenderLogoAntTitle(h, {
       logo, title, menuHeaderRender, collapsed,regionalSettingsMenuHeader
     })
+    const siderLinkClass = {
+      'ant-pro-sider-link-menu': true,
+      'ant-menu-dark': themeNew === 'dark',
+      'ant-menu-light': themeNew === 'light',
+      'ant-menu-root': true,
+      'ant-menu ': true,
+      'ant-menu-inline': true,
+    }
 
     return (<Sider
       class={siderCls}
@@ -156,13 +175,13 @@ const SiderMenu = {
         <BaseMenu collapsed={collapsed} menus={menusNew} mode={mode} theme={themeNew} i18nRender={i18nRender} layout={layout}/>
       )}
       </div>
-      {/* <div class="ant-pro-sider-links">
-        <ul role="menu" class="ant-pro-sider-link-menu ant-menu-dark ant-menu-root ant-menu ant-menu-inline">
-          <li role="menuitem" class="ant-pro-sider-collapsed-button ant-menu-item" style="padding-left: 16px;">
-            <Icon type={collapsed ? 'menu-unfold' : 'menu-fold'} />
+      <div class="ant-pro-sider-links">
+        <ul role="menu" class={siderLinkClass}>
+          <li role="menuitem" class="ant-pro-sider-collapsed-button ant-menu-item" style="padding-left: 16px;" onClick={()=>{toggle(this)}}>
+            {renderCollapsedButton(h,this,'slide')}
           </li>
         </ul>
-      </div> */}
+      </div>
     </Sider>)
   }
 }

@@ -150,7 +150,7 @@ const BasicLayout = {
             /> }
             <Layout 
             class={[layout]} style={{
-              paddingLeft: hasSiderMenu
+              paddingLeft: hasSiderMenu && regionalSettingsMenu
                 ? `${getPaddingLeft(!!hasLeftPadding, collapsed, siderWidth)}px`
                 : undefined,
               minHeight: '100vh'
